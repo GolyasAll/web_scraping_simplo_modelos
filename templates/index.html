@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel de Controle - Coleta</title>
+    <style>
+        body { font-family: sans-serif; background-color: #2d2d2d; color: #fff; padding: 20px; }
+        .container { max-width: 600px; margin: auto; background: #3d3d3d; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        input[type="text"], input[type="password"] { width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; border-radius: 5px; border: none; }
+        button { width: 100%; padding: 12px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 15px; }
+        button:disabled { background-color: #777; }
+        .pacotes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Painel de Controle - Coleta</h2>
+        <form id="form-coleta">
+            <input type="text" name="email" placeholder="E-mail" required>
+            <input type="password" name="senha" placeholder="Senha" required>
+            <input type="text" name="arquivo" placeholder="Nome do arquivo (ex: Versao_2026)" required>
+            
+            <div style="margin: 10px 0;">
+                <label><input type="checkbox" name="headless"> Modo Invisível</label> | 
+                <label><input type="checkbox" id="chk-todos"> Selecionar Todos</label>
+            </div>
+
+            <div class="pacotes">
+                <label><input type="checkbox" name="simplus" class="pacote"> Simplus</label>
+                <label><input type="checkbox" name="tractor" class="pacote"> Tractor & Cia</label>
+                <label><input type="checkbox" name="eletricos" class="pacote"> Elétricos & Cia</label>
+                <label><input type="checkbox" name="motos" class="pacote"> Motos</label>
+            </div>
+            
+            <button type="submit" id="btn-start">INICIAR COLETA</button>
+        </form>
+    </div>
+
+    <script>
+        // Lógica para selecionar todos
+        document.getElementById('chk-todos').onclick = function() {
+            document.querySelectorAll('.pacote').forEach(c => c.checked = document.getElementById('chk-todos').checked);
+        };
+
+        // Lógica para enviar o formulário
+        document.getElementById('form-coleta').onsubmit = function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-start');
+            btn.disabled = true;
+            btn.innerText = "Processando...";
+            
+            fetch('/iniciar_coleta', { method: 'POST', body: new FormData(e.target) })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.erro) alert(data.erro);
+                    else alert(data.mensagem);
+                    btn.disabled = false;
+                    btn.innerText = "INICIAR COLETA";
+                });
+        };
+    </script>
+</body>
+</html>
